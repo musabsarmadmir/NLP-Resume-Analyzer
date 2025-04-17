@@ -23,21 +23,15 @@ except LookupError:
 
 class ResumeParser:
     def __init__(self):
-        # Initialize database
         self.init_db()
         
         # Initialize NLTK
         self.stop_words = set(stopwords.words('english'))
-        
-        # Create UI
         self.create_ui()
     
     def init_db(self):
-        """Initialize SQLite database"""
-        self.conn = sqlite3.connect('resume_analyzer.db')
+        self.conn = sqlite3.connect('resumes_analyzer_ATS.db')
         self.cursor = self.conn.cursor()
-        
-        # Create tables if they don't exist
         self.cursor.execute('''
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY,
@@ -61,7 +55,6 @@ class ResumeParser:
         self.conn.commit()
     
     def extract_text_from_pdf(self, pdf_path):
-        """Extract text from PDF file"""
         text = ""
         try:
             with open(pdf_path, 'rb') as file:
@@ -74,7 +67,6 @@ class ResumeParser:
             return ""
     
     def parse_resume(self, text):
-        """Parse resume text using NLTK"""
         # Tokenize text
         tokens = word_tokenize(text.lower())
         
@@ -97,14 +89,12 @@ class ResumeParser:
         }
     
     def extract_skills(self, tokens, text):
-        """Extract skills from resume"""
-        # Common skills to look for (can be expanded)
         skills_list = [
-            "python", "java", "javascript", "html", "css", "sql", "nosql", 
-            "react", "angular", "vue", "node", "express", "django", "flask",
-            "aws", "azure", "gcp", "docker", "kubernetes", "git", "agile",
-            "scrum", "machine learning", "data analysis", "data science",
-            "tensorflow", "pytorch", "nlp", "computer vision"
+            "Python", "Java", "Javascript", "HTML", "CSS", "SQL", "NoSQL", 
+            "React", "Angular", "Vue", "Node", "Express", "Django", "Flask",
+            "AWS", "Azure", "GCP", "Docker", "Kubernetes", "Git", "Agile",
+            "Scrum", "Machine Learning", "Data Analysis", "Data Science",
+            "TensorFlow", "PyTorch", "NLP", "Computer Vision"
         ]
         
         skills_found = []
@@ -116,15 +106,15 @@ class ResumeParser:
         return skills_found
     
     def extract_education(self, text):
-        """Extract education information"""
         education = []
         
-        #School Name Patterns college, university, etc.
+        # School Name Patterns college, university, etc.
         education_patterns = [
         r'(?i)(?:Bachelor|BS|BA|Master|MS|MA|PhD|Doctorate|Associate)(?:\s+of\s+|\s+in\s+|\s+)(?:Science|Arts|Engineering|Business|Administration|Computer Science|Information Technology|Financial Technology|Data Science)',
         r'(?i)(?:University|College|Institute|School) of [\w\s]+',
         r'(?i)(?:FAST|FAST-NUCES|National University of Computer and Emerging Sciences)(?:[- ](?:Islamabad|Lahore|Karachi|Peshawar|Chiniot-Faisalabad|Faisalabad))?',
-        r'(?i)Foundation for Advancement of Science and Technology'
+        r'(?i)Foundation for Advancement of Science and Technology',
+        r'(?i)(?:High School|Secondary School|School) of [\w\s]+'
         ]
         
         for pattern in education_patterns:
@@ -186,10 +176,9 @@ class ResumeParser:
     def browse_file(self):
         filename = filedialog.askopenfilename(
             initialdir="/",
-            title="Select Resume PDF",
+            title="Select Resume. Only PDF files are supported",
             filetypes=(("PDF files", "*.pdf"), ("All files", "*.*"))
         )
-        
         if filename:
             self.file_path.set(filename)
     
@@ -238,10 +227,9 @@ class ResumeParser:
             self.result_text.insert(tk.END, f"- {exp}\n")
         
         if saved:
-            messagebox.showinfo("Success", f"Resume analyzed and saved with ATS score: {ats_score:.2f}%")
+            messagebox.showinfo("Success", f"Resume analyzed, ATS score: {ats_score:.2f}%")
     
     def create_ui(self):
-        """Create the Tkinter UI"""
         self.root = tk.Tk()
         self.root.title("Resume Analyzer")
         self.root.geometry("800x600")
