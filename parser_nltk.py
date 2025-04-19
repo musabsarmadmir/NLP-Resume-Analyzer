@@ -7,7 +7,8 @@ import PyPDF2
 import nltk; from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 
-# Download NLTK data (only needed once)
+# NLTK Data Packs (needed for tokenization and stopwords)
+# Download punkt and stopwords if not already available
 try:
     nltk.data.find('tokenizers/punkt')
 except LookupError:
@@ -22,25 +23,15 @@ except LookupError:
     nltk.download('stopwords')
 
 class ResumeParser:
-    def __init__(self):
+    def __init__(self, user_id=None):
+        self.user_id = user_id
         self.init_db()
-        
-        # Initialize NLTK
         self.stop_words = set(stopwords.words('english'))
         self.create_ui()
-    
+
     def init_db(self):
         self.conn = sqlite3.connect('resumes_analyzer_ATS.db')
         self.cursor = self.conn.cursor()
-        self.cursor.execute('''
-        CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY,
-            name TEXT,
-            age INTEGER,
-            password TEXT
-        )
-        ''')
-        
         self.cursor.execute('''
         CREATE TABLE IF NOT EXISTS resume_scores (
             id INTEGER PRIMARY KEY,
