@@ -29,11 +29,9 @@ class AuthSystem:
         conn.close()
 
     def hash_password(self, password):
-        """Hash password using SHA-256"""
         return hashlib.sha256(password.encode()).hexdigest()
 
     def register_user(self, name, age, email, password):
-        """Register a new user"""
         hashed_password = self.hash_password(password)
         try:
             conn = sqlite3.connect(self.db_path)
@@ -45,13 +43,11 @@ class AuthSystem:
             conn.commit()
             return True
         except sqlite3.IntegrityError:
-            # Email already exists
             return False
         finally:
             conn.close()
 
     def authenticate_user(self, email, password):
-        """Authenticate a user by email and password"""
         hashed_password = self.hash_password(password)
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
@@ -61,7 +57,6 @@ class AuthSystem:
         return user
 
     def get_user_by_id(self, user_id):
-        """Get user information by ID"""
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM users WHERE id=?", (user_id,))
@@ -74,12 +69,11 @@ class AuthUI:
         self.auth_system = AuthSystem()
         self.on_login_success = on_login_success
         
-        # Configure customtkinter
-        ctk.set_appearance_mode("light")
+        ctk.set_appearance_mode("dark")
         ctk.set_default_color_theme("blue")
         
         self.window = ctk.CTk()
-        self.window.title("Resume Analyzer - Authentication")
+        self.window.title("Login/Register")
         self.window.geometry("800x600")
         
         self.container = ctk.CTkFrame(self.window, fg_color="transparent")
@@ -88,7 +82,6 @@ class AuthUI:
         self.show_login_frame()
         
     def show_login_frame(self):
-        """Display the login frame"""
         for widget in self.container.winfo_children():
             widget.destroy()
             
@@ -104,7 +97,7 @@ class AuthUI:
         
         ctk.CTkLabel(
             login_frame,
-            text="Resume Analyzer Login",
+            text="Login/Register",
             font=("Helvetica", 32, "bold")
         ).pack(pady=(40, 20))
         
@@ -159,7 +152,6 @@ class AuthUI:
         ).pack(side="left")
 
     def show_register_frame(self):
-        """Display the registration frame"""
         for widget in self.container.winfo_children():
             widget.destroy()
             
@@ -183,7 +175,7 @@ class AuthUI:
             register_frame,
             width=300,
             height=50,
-            placeholder_text="Full Name",
+            placeholder_text="Name",
             corner_radius=25
         )
         name_entry.pack(pady=10)
@@ -264,7 +256,6 @@ class AuthUI:
         ).pack(side="left")
 
     def login(self, email, password):
-        """Handle login process"""
         if not email or not password:
             self.show_message("Error", "Please enter both email and password")
             return
@@ -280,7 +271,6 @@ class AuthUI:
             self.show_message("Error", "Invalid email or password")
 
     def register(self, name, age, email, password, confirm_password):
-        """Handle registration process"""
         if not name or not age or not email or not password or not confirm_password:
             self.show_message("Error", "Please fill in all fields")
             return
@@ -288,7 +278,7 @@ class AuthUI:
         try:
             age = int(age)
         except ValueError:
-            self.show_message("Error", "Age must be a number")
+            self.show_message("Error", "Age is a postive integer")
             return
             
         if password != confirm_password:
@@ -304,10 +294,8 @@ class AuthUI:
             self.show_message("Error", "Registration failed. Email may already be in use.")
 
     def show_message(self, title, message):
-        """Display a message dialog"""
         messagebox.showinfo(title, message)
 
     def run(self):
-        """Run the authentication UI"""
         self.window.mainloop()
         return self.auth_system.current_user
