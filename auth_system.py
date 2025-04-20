@@ -69,11 +69,11 @@ class AuthUI:
         self.auth_system = AuthSystem()
         self.on_login_success = on_login_success
         
-        ctk.set_appearance_mode("dark")
+        ctk.set_appearance_mode("Light")
         ctk.set_default_color_theme("blue")
         
         self.window = ctk.CTk()
-        self.window.title("Login/Register")
+        self.window.title("Resume Analyzer ATS")
         self.window.geometry("800x600")
         
         self.container = ctk.CTkFrame(self.window, fg_color="transparent")
