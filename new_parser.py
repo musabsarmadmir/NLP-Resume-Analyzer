@@ -33,7 +33,7 @@ class ResumeParser:
         self.conn = sqlite3.connect('resumes_analyzer_ATS.db')
         self.cursor = self.conn.cursor()
         
-        # Create resume_scores table (enhanced)
+        
         self.cursor.execute('''
         CREATE TABLE IF NOT EXISTS resume_scores (
             id INTEGER PRIMARY KEY,
@@ -104,7 +104,24 @@ class ResumeParser:
         )
         ''')
         
+        # Create central resumes table that links all other tables
+        self.cursor.execute('''
+        CREATE TABLE IF NOT EXISTS resumes (
+            id INTEGER PRIMARY KEY,
+            user_id INTEGER NOT NULL,
+            resume_score_id INTEGER,
+            filename TEXT,
+            skills_count INTEGER DEFAULT 0,
+            education_count INTEGER DEFAULT 0,
+            experience_count INTEGER DEFAULT 0,
+            FOREIGN KEY (user_id) REFERENCES users (id),
+            FOREIGN KEY (resume_score_id) REFERENCES resume_scores (id)
+        )
+        ''')
+        
         self.conn.commit()
+        
+    
     
     def extract_text_from_pdf(self, pdf_path):
         text = ""
@@ -411,6 +428,21 @@ class ResumeParser:
             )
             
             resume_id = self.cursor.lastrowid
+            
+            # Count the number of items in each category
+            skills_count = len(parsed_data["skills"])
+            education_count = len(parsed_data["education"])
+            experience_count = len(parsed_data["experience"])
+            
+            # Insert into the central resumes table
+            self.cursor.execute(
+                """INSERT INTO resumes 
+                   (user_id, resume_score_id, filename, 
+                    skills_count, education_count, experience_count) 
+                   VALUES (?, ?, ?, ?, ?, ?)""",
+                (self.user_id, resume_id, filename, 
+                 skills_count, education_count, experience_count)
+            )
             
             # Insert skills
             for skill in parsed_data["skills"]:
