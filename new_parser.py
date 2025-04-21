@@ -380,7 +380,6 @@ class ResumeParser:
             
             score = skills_score + education_score + experience_score
         else:
-            # Use the original scoring method if no job description is provided
             # Score: Skills (up to 40 points), 1 Skill = 2.5 points, max 16 skills = 40 points
             skills_count = len(parsed_data["skills"])
             skills_score = min(skills_count * 2.5, 40)
@@ -393,7 +392,7 @@ class ResumeParser:
             
             # Experience score (up to 30 points), 1 Experience = 5 points, max 6 experiences = 30 points
             experience_count = len(parsed_data["experience"])
-            experience_score = min(experience_count * 5, 30)
+            experience_score = min(experience_count * 10, 30)
             score += experience_score
         
         return (score / max_score) * 100
