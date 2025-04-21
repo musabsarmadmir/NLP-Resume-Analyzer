@@ -9,7 +9,6 @@ def main():
     
     if user:
         print(f"User authenticated: {user[1]} (ID: {user[0]})")
-        # Just initialize the parser and let the UI handle the parsing
         parser = ResumeParser(user_id=user[0])
     else:
         print("Authentication failed or was cancelled")
